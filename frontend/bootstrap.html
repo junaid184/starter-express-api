@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+    <title>Hello, world!</title>
+    <style>
+      .main {
+        margin-top: 20%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .box {
+        margin: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="#">Navbar</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+          <a class="nav-item nav-link active" href="#">Home</a>
+          <a class="nav-item nav-link" href="#"> Contact Us</a>
+          <a class="nav-item nav-link" href="#">About Us</a>
+        </div>
+      </div>
+    </nav>
+    <div class="main">
+      <!-- Button trigger modal -->
+      <div class="box">
+        <h1>Search Website</h1>
+        <div class="form-inline mx-auto">
+          <input
+            style="width: 400px"
+            class="form-control"
+            type="search"
+            placeholder="Search"
+            aria-label="Search"
+            id="urlInput"
+          />
+          <button
+            class="btn btn-outline-primary my-2 my-sm-0"
+            type="submit"
+            data-toggle="modal"
+            data-target="#exampleModal"
+            onclick="sendUrl()"
+          >
+            Search
+          </button>
+        </div>
+        <!-- Modal -->
+        <div
+          class="modal fade"
+          id="exampleModal"
+          tabindex="-1"
+          role="dialog"
+          aria-labelledby="exampleModalLabel"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button
+                  type="button"
+                  class="close"
+                  data-dismiss="modal"
+                  aria-label="Close"
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body" id="list"></div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  data-dismiss="modal"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      function sendUrl() {
+        const url = document.getElementById("urlInput");
+        const urlValue = url?.value;
+        console.log(urlValue);
+        const divData = document.getElementById("list");
+
+        divData.innerHTML = `
+          </br>
+          <div class="spinner-border" role="status"></div>
+          <h3>Loading ...... please wait for the result. . . . . . </h3>
+          `;
+
+        axios
+          .post("https://6884-43-246-221-249.ngrok-free.app/getdata", {
+            url: urlValue,
+          })
+          .then((res) => {
+            console.log(res);
+            // const divData = document.getElementById("list");
+
+            // divData.innerHTML = `<h1>WEBSITE NAME: ${urlValue}<h1>
+            //     </br>
+            //     // <h3>Return Policy: </h3>
+            //     // <p>${res.data.refund}</p>
+            //     // <h3>SSL Certificate: ${res.data.ssl}</h3>
+            //     // <h3>Products Reviews</h3>
+            // `;
+            // const ulList = document.getElementById("ullist");
+            // ulList.innerHTML = res?.data?.productsInformation.map(
+            //   (i) =>
+            //     `<li> ${i.productName} has review : ${i.reviews.count} </li>`
+            // );
+            if (res.data.error) {
+              const scoreDiv = document.getElementById("list");
+
+              scoreDiv.innerHTML = `
+                  </br>
+                  <h2> Error: ${res.data.message} </h2>`;
+            } else {
+              function score(
+                user_reviews,
+                security_certificates,
+                return_policy,
+                product_information
+              ) {
+                if (
+                  (security_certificates === true,
+                  return_policy === true,
+                  product_information)
+                ) {
+                  security_certificates = 1;
+                  return_policy = 1;
+                  product_information = 1;
+                }
+
+                const weights = {
+                  user_reviews: 0.3,
+                  security_certificates: 0.2,
+                  return_policy: 0.15,
+                  brand_reputation: 0.15,
+                  customer_service: 0.1,
+                  product_information: 0.1,
+                };
+
+                const score =
+                  user_reviews * weights["user_reviews"] +
+                  security_certificates * weights["security_certificates"] +
+                  return_policy * weights["return_policy"] +
+                  product_information * weights["product_information"];
+
+                return score;
+              }
+
+              let scoreValue = score(
+                res.data.productsInformation[0].reviews.count,
+                res.data.ssl,
+                res.data.refund.exist,
+                res.data.productsInformation[0]
+              );
+              const scoreDiv = document.getElementById("list");
+              scoreValue = scoreValue.toFixed(2);
+
+              scoreDiv.innerHTML = `
+                </br>
+                  <h2> Score: </h2>
+                  <h4>Policy: ${res.data.refund ? true : false}</h4>
+                  <h4>SSL Certificate: ${res.data.ssl ? true : false}</h4>
+                  <h4> Product Information: true </h4>
+                  <h4> Product Review: ${
+                    res?.data?.productsInformation[0]?.reviews?.count
+                  }</h4>
+                  <h4> Total Score is : ${scoreValue}</h4>`;
+            }
+          })
+          .catch((e) => {
+            const scoreDiv = document.getElementById("list");
+            scoreDiv.innerHTML = `<h3> Error: Product.json Not Found </h3>`;
+          });
+      }
+    </script>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+      integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  </body>
+</html>
