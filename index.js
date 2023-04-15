@@ -7,10 +7,10 @@ import cors from "cors";
 const PORT = process.env.PORT || 8000;
 app.use(express.json());
 
-app.use(express.static(path.join(__dirname, "./frontend")));
+app.use(express.static(path.join(__dirname, "./frontend/build")));
 
 app.get("*", (req, res, next) => {
-    res.sendFile(path.join(__dirname, "./frontend/bootstrap.html"));
+    res.sendFile(path.join(__dirname, "./frontend/build/bootstrap.html"));
 });
 
 app.post("/getdata", async (req, res, next) => {
