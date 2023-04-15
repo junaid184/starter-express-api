@@ -11,7 +11,7 @@ app.get("/", (req, res, next) => {
     res.sendFile(path.join(__dirname, "./frontend/bootstrap.html"));
 });
 
-app.post("/getdata", async (req, res) => {
+app.post("/getdata", async (req, res, next) => {
     console.log(req.body);
     const data = await sessionStart(req.body.url);
     res.send(data);
