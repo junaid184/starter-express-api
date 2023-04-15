@@ -7,6 +7,8 @@ import cors from "cors";
 const PORT = process.env.PORT || 8000;
 app.use(express.json());
 
+app.use(express.static(path.join(__dirname, "./frontend")));
+
 app.get("/", (req, res, next) => {
     res.sendFile(path.join(__dirname, "./frontend/bootstrap.html"));
 });
